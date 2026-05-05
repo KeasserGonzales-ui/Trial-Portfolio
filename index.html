@@ -162,8 +162,6 @@
       padding: 28px;
       box-shadow: var(--shadow);
       backdrop-filter: blur(18px);
-      position: relative;
-      overflow: hidden;
     }
 
     .avatar {
@@ -306,6 +304,8 @@
       cursor: pointer;
       box-shadow: 0 0 25px rgba(34,197,94,0.55);
       z-index: 3;
+      text-decoration: none;
+      white-space: nowrap;
     }
 
     .features {
@@ -601,9 +601,9 @@
 
       <div class="project-card">
         <div class="project-main">
-          <div class="project-preview image-click" data-title="Mini Google Drive - Admin Files">
+          <div class="project-preview">
             <img src="admin-files.png" alt="Mini Google Drive Admin Files Screenshot">
-            <button class="zoom-btn" type="button">🔍 VIEW PROJECT</button>
+            <a class="zoom-btn zoom-link" href="admin-files.png" target="_blank" data-title="Mini Google Drive - Admin Files">🔍 VIEW PROJECT</a>
           </div>
 
           <div>
@@ -626,30 +626,30 @@
           </div>
         </div>
 
-        <p class="mobile-tip">📱 Sa phone: tap image or VIEW button para lumaki ang preview.</p>
+        <p class="mobile-tip">📱 Sa phone: tap VIEW button. Bubukas yung image mismo para pwede i-pinch zoom.</p>
 
         <div class="screenshot-gallery">
-          <div class="shot image-click" data-title="Admin Files">
+          <div class="shot">
             <img src="admin-files.png" alt="Admin Files">
-            <button class="zoom-btn" type="button">🔍 VIEW</button>
+            <a class="zoom-btn zoom-link" href="admin-files.png" target="_blank" data-title="Admin Files">🔍 VIEW</a>
             <p>Admin Files</p>
           </div>
 
-          <div class="shot image-click" data-title="Admin User Panel">
+          <div class="shot">
             <img src="admin-users.png" alt="Admin User Panel">
-            <button class="zoom-btn" type="button">🔍 VIEW</button>
+            <a class="zoom-btn zoom-link" href="admin-users.png" target="_blank" data-title="Admin User Panel">🔍 VIEW</a>
             <p>Admin User Panel</p>
           </div>
 
-          <div class="shot image-click" data-title="Drive Panel">
+          <div class="shot">
             <img src="drive-panel.png" alt="Drive Panel">
-            <button class="zoom-btn" type="button">🔍 VIEW</button>
+            <a class="zoom-btn zoom-link" href="drive-panel.png" target="_blank" data-title="Drive Panel">🔍 VIEW</a>
             <p>Drive Panel</p>
           </div>
 
-          <div class="shot image-click" data-title="Login Page">
+          <div class="shot">
             <img src="login.png" alt="Login Page">
-            <button class="zoom-btn" type="button">🔍 VIEW</button>
+            <a class="zoom-btn zoom-link" href="login.png" target="_blank" data-title="Login Page">🔍 VIEW</a>
             <p>Login Page</p>
           </div>
         </div>
@@ -698,33 +698,29 @@
   </div>
 
   <script>
-    const imageClicks = document.querySelectorAll(".image-click");
+    const zoomLinks = document.querySelectorAll(".zoom-link");
     const imageModal = document.getElementById("imageModal");
     const modalImage = document.getElementById("modalImage");
     const modalTitle = document.getElementById("modalTitle");
     const modalClose = document.getElementById("modalClose");
 
-    function openModal(item) {
-      const image = item.querySelector("img");
-      modalImage.src = image.getAttribute("src");
-      modalImage.alt = image.getAttribute("alt");
-      modalTitle.textContent = item.dataset.title || image.alt || "Project Preview";
-      imageModal.classList.add("active");
-      document.body.style.overflow = "hidden";
+    function isMobileScreen() {
+      return window.innerWidth <= 768;
     }
 
-    imageClicks.forEach((item) => {
-      item.addEventListener("click", function(event) {
-        event.preventDefault();
-        event.stopPropagation();
-        openModal(item);
-      });
+    zoomLinks.forEach((link) => {
+      link.addEventListener("click", function(event) {
+        if (isMobileScreen()) {
+          return;
+        }
 
-      item.addEventListener("touchend", function(event) {
         event.preventDefault();
-        event.stopPropagation();
-        openModal(item);
-      }, { passive: false });
+        modalImage.src = link.getAttribute("href");
+        modalImage.alt = link.dataset.title || "Project Preview";
+        modalTitle.textContent = link.dataset.title || "Project Preview";
+        imageModal.classList.add("active");
+        document.body.style.overflow = "hidden";
+      });
     });
 
     function closeModal() {
