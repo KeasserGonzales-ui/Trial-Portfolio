@@ -289,6 +289,7 @@
       border: 1px solid var(--border);
       box-shadow: var(--shadow);
       backdrop-filter: blur(18px);
+      overflow: visible;
     }
 
     .project-main {
@@ -306,6 +307,32 @@
       border: 1px solid var(--border);
       overflow: hidden;
       box-shadow: 0 18px 50px rgba(0,0,0,0.32);
+      cursor: zoom-in;
+      position: relative;
+    }
+
+    .project-preview::after,
+    .shot::after {
+      content: "🔍 Click to view";
+      position: absolute;
+      left: 12px;
+      bottom: 12px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(2, 6, 23, 0.78);
+      color: #bbf7d0;
+      border: 1px solid rgba(34,197,94,0.35);
+      font-size: 0.78rem;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: 0.25s ease;
+      pointer-events: none;
+    }
+
+    .project-preview:hover::after,
+    .shot:hover::after {
+      opacity: 1;
+      transform: translateY(0);
     }
 
     .project-preview img {
@@ -314,6 +341,12 @@
       min-height: 300px;
       object-fit: cover;
       display: block;
+      transition: transform 0.45s ease, filter 0.45s ease;
+    }
+
+    .project-preview:hover img {
+      transform: scale(1.12);
+      filter: brightness(1.08);
     }
 
     .features {
@@ -337,12 +370,16 @@
       border: 1px solid var(--border);
       border-radius: 16px;
       overflow: hidden;
-      transition: 0.2s;
+      transition: 0.3s ease;
+      cursor: zoom-in;
+      position: relative;
     }
 
     .shot:hover {
-      transform: translateY(-4px);
-      border-color: rgba(34,197,94,0.38);
+      transform: translateY(-8px) scale(1.08);
+      border-color: rgba(34,197,94,0.55);
+      box-shadow: 0 22px 55px rgba(0,0,0,0.48), 0 0 28px rgba(34,197,94,0.18);
+      z-index: 2;
     }
 
     .shot img {
@@ -350,12 +387,29 @@
       height: 120px;
       object-fit: cover;
       display: block;
+      transition: transform 0.4s ease, filter 0.4s ease;
+    }
+
+    .shot:hover img {
+      transform: scale(1.18);
+      filter: brightness(1.1);
     }
 
     .shot p {
       padding: 10px;
       color: var(--muted);
       font-size: 0.85rem;
+      text-align: center;
+      background: rgba(2, 6, 23, 0.45);
+      position: relative;
+      z-index: 1;
+    }
+
+    .mobile-tip {
+      display: none;
+      margin-top: 12px;
+      color: #bbf7d0;
+      font-size: 0.88rem;
       text-align: center;
     }
 
@@ -383,6 +437,79 @@
       background: rgba(2,6,23,0.6);
     }
 
+    .image-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      background: rgba(2, 6, 23, 0.88);
+      backdrop-filter: blur(12px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .image-modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      width: min(100%, 1050px);
+      animation: modalZoom 0.25s ease;
+    }
+
+    @keyframes modalZoom {
+      from {
+        opacity: 0;
+        transform: scale(0.92);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 12px;
+    }
+
+    .modal-title {
+      color: var(--text);
+      font-weight: 900;
+      font-size: 1rem;
+    }
+
+    .modal-close {
+      width: 42px;
+      height: 42px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.08);
+      color: white;
+      font-size: 1.4rem;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .modal-close:hover {
+      background: var(--green);
+      color: #020617;
+    }
+
+    .modal-content img {
+      width: 100%;
+      max-height: 82vh;
+      object-fit: contain;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.18);
+      box-shadow: 0 28px 90px rgba(0,0,0,0.6);
+      background: rgba(15,23,42,0.85);
+    }
+
     @media (max-width: 850px) {
       .hero,
       .project-main,
@@ -396,6 +523,17 @@
       }
 
       .nav-links { display: none; }
+
+      .mobile-tip {
+        display: block;
+      }
+
+      .project-preview::after,
+      .shot::after {
+        content: "👆 Tap to zoom";
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     @media (max-width: 520px) {
@@ -410,6 +548,30 @@
       }
 
       section { padding: 50px 0; }
+
+      .project-card {
+        padding: 18px;
+      }
+
+      .project-preview {
+        min-height: 230px;
+      }
+
+      .project-preview img {
+        min-height: 230px;
+      }
+
+      .shot img {
+        height: 190px;
+      }
+
+      .shot:hover {
+        transform: none;
+      }
+
+      .shot:hover img {
+        transform: scale(1.05);
+      }
     }
   </style>
 </head>
@@ -517,7 +679,7 @@
 
       <div class="project-card">
         <div class="project-main">
-          <div class="project-preview">
+          <div class="project-preview image-click" data-title="Mini Google Drive - Admin Files">
             <img src="admin-files.png" alt="Mini Google Drive Admin Files Screenshot">
           </div>
 
@@ -541,23 +703,25 @@
           </div>
         </div>
 
+        <p class="mobile-tip">👆 Tap any project screenshot to zoom.</p>
+
         <div class="screenshot-gallery">
-          <div class="shot">
+          <div class="shot image-click" data-title="Admin Files">
             <img src="admin-files.png" alt="Admin Files">
             <p>Admin Files</p>
           </div>
 
-          <div class="shot">
+          <div class="shot image-click" data-title="Admin User Panel">
             <img src="admin-users.png" alt="Admin User Panel">
             <p>Admin User Panel</p>
           </div>
 
-          <div class="shot">
+          <div class="shot image-click" data-title="Drive Panel">
             <img src="drive-panel.png" alt="Drive Panel">
             <p>Drive Panel</p>
           </div>
 
-          <div class="shot">
+          <div class="shot image-click" data-title="Login Page">
             <img src="login.png" alt="Login Page">
             <p>Login Page</p>
           </div>
@@ -594,5 +758,55 @@
   <footer>
     © 2026 Keasser Gonzales — System & Web Developer
   </footer>
+
+  <div class="image-modal" id="imageModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title" id="modalTitle">Project Preview</div>
+        <button class="modal-close" id="modalClose" type="button">×</button>
+      </div>
+
+      <img id="modalImage" src="" alt="Project Preview">
+    </div>
+  </div>
+
+  <script>
+    const imageClicks = document.querySelectorAll(".image-click");
+    const imageModal = document.getElementById("imageModal");
+    const modalImage = document.getElementById("modalImage");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalClose = document.getElementById("modalClose");
+
+    imageClicks.forEach((item) => {
+      item.addEventListener("click", () => {
+        const image = item.querySelector("img");
+        modalImage.src = image.src;
+        modalImage.alt = image.alt;
+        modalTitle.textContent = item.dataset.title || image.alt || "Project Preview";
+        imageModal.classList.add("active");
+        document.body.style.overflow = "hidden";
+      });
+    });
+
+    function closeModal() {
+      imageModal.classList.remove("active");
+      document.body.style.overflow = "";
+      modalImage.src = "";
+    }
+
+    modalClose.addEventListener("click", closeModal);
+
+    imageModal.addEventListener("click", (event) => {
+      if (event.target === imageModal) {
+        closeModal();
+      }
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        closeModal();
+      }
+    });
+  </script>
 </body>
 </html>
